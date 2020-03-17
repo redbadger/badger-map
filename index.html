@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Job Spec Canvas</title>
+    <title>Badger Map</title>
     <meta charset="utf-8" />
     <style type="text/css">
       html,
@@ -9,6 +9,31 @@
         height: 100%;
         margin: 0;
         padding: 0;
+        font-size: 12px;
+      }
+
+      #main {
+        height: 100%;
+      }
+
+      #message {
+        position: absolute;
+        width: 100%;
+        top: 0;
+        height: 50px;
+        z-index: 20;
+        margin: 0;
+        padding: 0;
+        color: red;
+      }
+
+      .map-info-window {
+        font-size: 10px;
+      }
+
+      .map-info-window h1 {
+        font-size: 110%;
+        font-weight: normal;
       }
     </style>
   </head>
@@ -23,7 +48,7 @@
       // Client ID and API key from the Developer Console
       var CLIENT_ID =
         "210239184765-3di0koo4a4da0808q3mr8pvpacb091ik.apps.googleusercontent.com";
-      var API_KEY = "9OrO_IT4AFrxNJmdl0svIfkL";
+      var API_KEY = "AIzaSyDUS71lkbmxyHuk1Z78oK6srFbtFoyknnE";
 
       // Array of API discovery doc URLs for APIs used by the quickstart
       var DISCOVERY_DOCS = [
@@ -36,6 +61,7 @@
       var SPREADSHEET_ID = "1U_mjJv-3xlxfx1R1-f6eJY5UjWbDEVevu_oCziy4a4I";
 
       var authorizeButton = document.getElementById("authorize-button");
+      var map, geocoder; // initialised by initMap()
 
       /**
        *  On load, called to load the auth2 library and API client library.
@@ -63,7 +89,9 @@
             // Handle the initial sign-in state.
             updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
             authorizeButton.onclick = handleAuthClick;
-            signoutButton.onclick = handleSignoutClick;
+          })
+          .catch(function(e) {
+            console.error("Failed to initialise", e);
           });
       }
 
@@ -106,8 +134,13 @@
         pre.appendChild(textContent);
       }
 
-      function renderMap() {
+      function initMap() {
         var main = document.getElementById("main");
+
+        map = new google.maps.Map(main, {
+          center: { lat: 51.507, lng: -0.128 },
+          zoom: 11
+        });
       }
 
       /**
@@ -117,16 +150,33 @@
         gapi.client.sheets.spreadsheets.values
           .get({
             spreadsheetId: SPREADSHEET_ID,
-            range: "master"
+            range: "people"
           })
           .then(
             function(response) {
               var range = response.result;
 
-              appendPre(JSON.stringify(range.values));
+              range.values.forEach(function(row) {
+                var [name, lat, lng, slack] = row;
+
+                console.log("Add marker for", name, "at", lat, lng);
+                var marker = new google.maps.Marker({
+                  position: { lat: +lat, lng: +lng },
+                  animation: google.maps.Animation.DROP,
+                  map: map
+                });
+                var infowindow = new google.maps.InfoWindow({
+                  content: `<div class="map-info-window">
+                  <h1>${name}</h1><p>Slack: ${slack}</p>
+                  </div>`
+                });
+                marker.addListener("click", function() {
+                  infowindow.open(map, marker);
+                });
+              });
             },
             function(response) {
-              appendPre("Error: " + response.result.error.message);
+              showMessage("Error: " + response.result.error.message);
             }
           );
       }
@@ -138,6 +188,11 @@
       src="https://apis.google.com/js/api.js"
       onload="this.onload=function(){};handleClientLoad()"
       onreadystatechange="if (this.readyState === 'complete') this.onload()"
+    ></script>
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDUS71lkbmxyHuk1Z78oK6srFbtFoyknnE&callback=initMap"
+      async
+      defer
     ></script>
   </body>
 </html>
