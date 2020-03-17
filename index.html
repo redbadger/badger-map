@@ -16,17 +16,6 @@
         height: 100%;
       }
 
-      #message {
-        position: absolute;
-        width: 100%;
-        top: 0;
-        height: 50px;
-        z-index: 20;
-        margin: 0;
-        padding: 0;
-        color: red;
-      }
-
       .map-info-window {
         font-size: 10px;
       }
@@ -41,7 +30,6 @@
     <!--Add buttons to initiate auth sequence and sign out-->
     <button id="authorize-button" style="display: none;">Authorize</button>
 
-    <pre id="message"></pre>
     <div id="main"></div>
 
     <script type="text/javascript">
@@ -122,18 +110,6 @@
         gapi.auth2.getAuthInstance().signOut();
       }
 
-      /**
-       * Append a pre element to the body containing the given message
-       * as its text node. Used to display the results of the API call.
-       *
-       * @param {string} message Text to be placed in pre element.
-       */
-      function showMessage(message) {
-        var pre = document.getElementById("message");
-        var textContent = document.createTextNode(message + "\n");
-        pre.appendChild(textContent);
-      }
-
       function initMap() {
         var main = document.getElementById("main");
 
@@ -176,7 +152,7 @@
               });
             },
             function(response) {
-              showMessage("Error: " + response.result.error.message);
+              console.error("Error: " + response.result.error.message);
             }
           );
       }
