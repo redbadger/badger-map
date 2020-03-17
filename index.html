@@ -9,7 +9,8 @@
         height: 100%;
         margin: 0;
         padding: 0;
-        font-size: 12px;
+        font-size: 14px;
+        font-family: Arial, Helvetica, sans-serif;
       }
 
       #main {
@@ -17,18 +18,58 @@
       }
 
       .map-info-window {
-        font-size: 10px;
+        font-size: 14px;
       }
 
       .map-info-window h1 {
         font-size: 110%;
         font-weight: normal;
       }
+
+      #authorize-button {
+        width: 30%;
+        height: 30%;
+        background-color: white;
+        border-radius: 15px;
+        box-shadow: 0px 5px 10px 2px #888888;
+        position: absolute;
+        top: 30%;
+        left: 35%;
+        z-index: 10;
+      }
+
+      #authorize-button h1 {
+        padding: 0.2em 1em;
+        font-size: 26px;
+        font-weight: lighter;
+      }
+
+      #authorize-button p {
+        padding: 0.2em 2em;
+        font-weight: normal;
+      }
+
+      #authorize-button button {
+        margin: 1em auto;
+        padding: 0.2em 0.5em;
+        font-size: 22px;
+        color: white;
+        font-weight: bold;
+        background-color: #212121;
+        border: none;
+        cursor: pointer;
+      }
     </style>
   </head>
   <body>
     <!--Add buttons to initiate auth sequence and sign out-->
-    <button id="authorize-button" style="display: none;">Authorize</button>
+    <div id="authorize-button" style="display: none;">
+      <h1>Sign in to continue</h1>
+      <p>You need to sign in with a Red Badger account to continue</p>
+      <p>
+        <button>Sign in</button>
+      </p>
+    </div>
 
     <div id="main"></div>
 
