@@ -26,9 +26,12 @@
         font-weight: normal;
       }
 
-      #authorize-button {
+      .map-info-window table th {
+        text-align: left;
+      }
+
+      #authorize-dialog {
         width: 30%;
-        height: 30%;
         background-color: white;
         border-radius: 15px;
         box-shadow: 0px 5px 10px 2px #888888;
@@ -38,18 +41,18 @@
         z-index: 10;
       }
 
-      #authorize-button h1 {
+      #authorize-dialog h1 {
         padding: 0.2em 1em;
         font-size: 26px;
         font-weight: lighter;
       }
 
-      #authorize-button p {
+      #authorize-dialog p {
         padding: 0.2em 2em;
         font-weight: normal;
       }
 
-      #authorize-button button {
+      #authorize-button {
         margin: 1em auto;
         padding: 0.2em 0.5em;
         font-size: 22px;
@@ -59,38 +62,54 @@
         border: none;
         cursor: pointer;
       }
+
+      #add-yourself-info {
+        position: absolute;
+        background-color: white;
+        box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px;
+        left: 0;
+        bottom: 0;
+        margin: 10px;
+        padding: 10px 17px;
+      }
     </style>
   </head>
   <body>
     <!--Add buttons to initiate auth sequence and sign out-->
-    <div id="authorize-button" style="display: none;">
+    <div id="authorize-dialog" style="display: none;">
       <h1>Sign in to continue</h1>
       <p>You need to sign in with a Red Badger account to continue</p>
       <p>
-        <button>Sign in</button>
+        <button id="authorize-button">Sign in</button>
       </p>
     </div>
 
     <div id="main"></div>
 
+    <div id="add-yourself-info">
+      Rightclick your home on the map to<br />see instructions for adding
+      yourself.
+    </div>
+
     <script type="text/javascript">
       // Client ID and API key from the Developer Console
-      var CLIENT_ID =
+      const CLIENT_ID =
         "210239184765-3di0koo4a4da0808q3mr8pvpacb091ik.apps.googleusercontent.com";
-      var API_KEY = "AIzaSyDUS71lkbmxyHuk1Z78oK6srFbtFoyknnE";
+      const API_KEY = "AIzaSyDUS71lkbmxyHuk1Z78oK6srFbtFoyknnE";
 
       // Array of API discovery doc URLs for APIs used by the quickstart
-      var DISCOVERY_DOCS = [
+      const DISCOVERY_DOCS = [
         "https://sheets.googleapis.com/$discovery/rest?version=v4"
       ];
 
       // Authorization scopes required by the API; multiple scopes can be
       // included, separated by spaces.
-      var SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly";
-      var SPREADSHEET_ID = "1U_mjJv-3xlxfx1R1-f6eJY5UjWbDEVevu_oCziy4a4I";
+      const SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly";
+      const SPREADSHEET_ID = "1U_mjJv-3xlxfx1R1-f6eJY5UjWbDEVevu_oCziy4a4I";
 
-      var authorizeButton = document.getElementById("authorize-button");
-      var map, geocoder; // initialised by initMap()
+      const authorizeDialog = document.getElementById("authorize-dialog");
+      const authorizeButton = document.getElementById("authorize-button");
+      let map, geocoder; // initialised by initMap()
 
       /**
        *  On load, called to load the auth2 library and API client library.
@@ -130,10 +149,11 @@
        */
       function updateSigninStatus(isSignedIn) {
         if (isSignedIn) {
-          authorizeButton.style.display = "none";
+          authorizeDialog.style.display = "none";
           layoutCanvas();
+          setupAddYourselfWindow();
         } else {
-          authorizeButton.style.display = "block";
+          authorizeDialog.style.display = "block";
         }
       }
 
@@ -152,7 +172,7 @@
       }
 
       function initMap() {
-        var main = document.getElementById("main");
+        const main = document.getElementById("main");
 
         map = new google.maps.Map(main, {
           center: { lat: 51.507, lng: -0.128 },
@@ -171,22 +191,23 @@
           })
           .then(
             function(response) {
-              var range = response.result;
+              const range = response.result;
 
               range.values.forEach(function(row) {
-                var [name, lat, lng, slack] = row;
+                const [name, lat, lng, slack] = row;
 
                 console.log("Add marker for", name, "at", lat, lng);
-                var marker = new google.maps.Marker({
+                const marker = new google.maps.Marker({
                   position: { lat: +lat, lng: +lng },
                   animation: google.maps.Animation.DROP,
-                  map: map
+                  map
                 });
-                var infowindow = new google.maps.InfoWindow({
-                  content: `<div class="map-info-window">
-                  <h1>${name}</h1><p>Slack: ${slack}</p>
-                  </div>`
-                });
+                const content = document.createElement("div");
+                content.className = "map-info-window";
+                content.innerHTML = "<h1></h1><p></p>";
+                content.querySelector("h1").textContent = name;
+                content.querySelector("p").textContent = `Slack: ${slack}`;
+                const infowindow = new google.maps.InfoWindow({ content });
                 marker.addListener("click", function() {
                   infowindow.open(map, marker);
                 });
@@ -196,6 +217,42 @@
               console.error("Error: " + response.result.error.message);
             }
           );
+      }
+
+      /**
+       * Show a info window on right click, describing how to add youself to
+       * the map.
+       */
+      function setupAddYourselfWindow() {
+        const content = document.createElement("div");
+        content.className = "map-info-window";
+        content.innerHTML = `
+          <h1>Add yourself</h1>
+          <p>Open the <a href="https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit" target="_blank" rel="noopener">spreadsheet</a> and add your name and Slack handle.<br>Copy the coordinates from here:</p>
+          <table>
+            <tr>
+              <th scope="row">Latitude</th>
+              <td class="lat"></td>
+            </tr>
+            <tr>
+              <th scope="row">Longitude</th>
+              <td class="lng"></td>
+            </tr>
+          </table>
+        `;
+        const infowindow = new google.maps.InfoWindow({ content });
+        map.addListener("rightclick", function(e) {
+          content.querySelector(".lat").textContent = e.latLng.lat();
+          content.querySelector(".lng").textContent = e.latLng.lng();
+          infowindow.open(map, {
+            get(prop) {
+              switch (prop) {
+                case "position":
+                  return e.latLng;
+              }
+            }
+          });
+        });
       }
     </script>
 
