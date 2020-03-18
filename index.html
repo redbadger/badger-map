@@ -171,22 +171,23 @@
           })
           .then(
             function(response) {
-              var range = response.result;
+              const range = response.result;
 
               range.values.forEach(function(row) {
-                var [name, lat, lng, slack] = row;
+                const [name, lat, lng, slack] = row;
 
                 console.log("Add marker for", name, "at", lat, lng);
-                var marker = new google.maps.Marker({
+                const marker = new google.maps.Marker({
                   position: { lat: +lat, lng: +lng },
                   animation: google.maps.Animation.DROP,
-                  map: map
+                  map
                 });
-                var infowindow = new google.maps.InfoWindow({
-                  content: `<div class="map-info-window">
-                  <h1>${name}</h1><p>Slack: ${slack}</p>
-                  </div>`
-                });
+                const content = document.createElement("div");
+                content.className = "map-info-window";
+                content.innerHTML = "<h1></h1><p></p>";
+                content.querySelector("h1").textContent = name;
+                content.querySelector("p").textContent = `Slack: ${slack}`;
+                const infowindow = new google.maps.InfoWindow({ content });
                 marker.addListener("click", function() {
                   infowindow.open(map, marker);
                 });
