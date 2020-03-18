@@ -26,9 +26,12 @@
         font-weight: normal;
       }
 
+      .map-info-window table th {
+        text-align: left;
+      }
+
       #authorize-dialog {
         width: 30%;
-        height: 30%;
         background-color: white;
         border-radius: 15px;
         box-shadow: 0px 5px 10px 2px #888888;
@@ -133,6 +136,7 @@
         if (isSignedIn) {
           authorizeDialog.style.display = "none";
           layoutCanvas();
+          setupAddYourselfWindow();
         } else {
           authorizeDialog.style.display = "block";
         }
@@ -198,6 +202,42 @@
               console.error("Error: " + response.result.error.message);
             }
           );
+      }
+
+      /**
+       * Show a info window on right click, describing how to add youself to
+       * the map.
+       */
+      function setupAddYourselfWindow() {
+        const content = document.createElement("div");
+        content.className = "map-info-window";
+        content.innerHTML = `
+          <h1>Add yourself</h1>
+          <p>Open the <a href="https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit" target="_blank" rel="noopener">spreadsheet</a> and add your name and Slack handle.<br>Copy the coordinates from here:</p>
+          <table>
+            <tr>
+              <th scope="row">Latitude</th>
+              <td class="lat"></td>
+            </tr>
+            <tr>
+              <th scope="row">Longitude</th>
+              <td class="lng"></td>
+            </tr>
+          </table>
+        `;
+        const infowindow = new google.maps.InfoWindow({ content });
+        map.addListener("rightclick", function(e) {
+          content.querySelector(".lat").textContent = e.latLng.lat();
+          content.querySelector(".lng").textContent = e.latLng.lng();
+          infowindow.open(map, {
+            get(prop) {
+              switch (prop) {
+                case "position":
+                  return e.latLng;
+              }
+            }
+          });
+        });
       }
     </script>
 
