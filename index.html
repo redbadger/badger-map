@@ -193,6 +193,14 @@
             function(response) {
               const range = response.result;
 
+              var pinIcon = new google.maps.MarkerImage(
+                "./badger-pin.png",
+                null /* size is determined at runtime */,
+                null /* origin is 0,0 */,
+                null /* anchor is bottom center of the scaled image */,
+                new google.maps.Size(30, 50)
+              );
+
               range.values.forEach(function(row) {
                 const [name, lat, lng, slack] = row;
 
@@ -200,6 +208,7 @@
                 const marker = new google.maps.Marker({
                   position: { lat: +lat, lng: +lng },
                   animation: google.maps.Animation.DROP,
+                  icon: pinIcon,
                   map
                 });
                 const content = document.createElement("div");
