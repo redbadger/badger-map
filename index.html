@@ -19,11 +19,12 @@
 
       .map-info-window {
         font-size: 14px;
+        padding: 0 0.4em;
+        margin: -0.4em 0;
       }
 
       .map-info-window h1 {
         font-size: 110%;
-        font-weight: normal;
       }
 
       .map-info-window table th {
@@ -72,6 +73,10 @@
         margin: 10px;
         padding: 10px 17px;
       }
+
+      #add-yourself-info h1 {
+        font-size: 1.2em;
+      }
     </style>
   </head>
   <body>
@@ -87,8 +92,11 @@
     <div id="main"></div>
 
     <div id="add-yourself-info">
-      Rightclick your home on the map to<br />see instructions for adding
-      yourself.
+      <h1>🗺 Not on the map yet?</h1>
+      <p>
+        Click on your home on the map to<br />see instructions for adding
+        yourself.
+      </p>
     </div>
 
     <script type="text/javascript">
@@ -201,10 +209,11 @@
                 new google.maps.Size(30, 50)
               );
 
+              let lastInfoWindow;
+
               range.values.forEach(function(row) {
                 const [name, lat, lng, slack] = row;
 
-                console.log("Add marker for", name, "at", lat, lng);
                 const marker = new google.maps.Marker({
                   position: { lat: +lat, lng: +lng },
                   animation: google.maps.Animation.DROP,
@@ -216,9 +225,15 @@
                 content.innerHTML = "<h1></h1><p></p>";
                 content.querySelector("h1").textContent = name;
                 content.querySelector("p").textContent = `Slack: ${slack}`;
-                const infowindow = new google.maps.InfoWindow({ content });
+
+                const infoWindow = new google.maps.InfoWindow({ content });
                 marker.addListener("click", function() {
-                  infowindow.open(map, marker);
+                  if (lastInfoWindow && lastInfoWindow.close) {
+                    lastInfoWindow.close();
+                  }
+
+                  lastInfoWindow = infoWindow;
+                  infoWindow.open(map, marker);
                 });
               });
             },
@@ -250,7 +265,7 @@
           </table>
         `;
         const infowindow = new google.maps.InfoWindow({ content });
-        map.addListener("rightclick", function(e) {
+        map.addListener("click", function(e) {
           content.querySelector(".lat").textContent = e.latLng.lat();
           content.querySelector(".lng").textContent = e.latLng.lng();
           infowindow.open(map, {
