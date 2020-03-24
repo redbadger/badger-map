@@ -201,10 +201,11 @@
                 new google.maps.Size(30, 50)
               );
 
+              let lastInfoWindow;
+
               range.values.forEach(function(row) {
                 const [name, lat, lng, slack] = row;
 
-                console.log("Add marker for", name, "at", lat, lng);
                 const marker = new google.maps.Marker({
                   position: { lat: +lat, lng: +lng },
                   animation: google.maps.Animation.DROP,
@@ -216,9 +217,15 @@
                 content.innerHTML = "<h1></h1><p></p>";
                 content.querySelector("h1").textContent = name;
                 content.querySelector("p").textContent = `Slack: ${slack}`;
-                const infowindow = new google.maps.InfoWindow({ content });
+
+                const infoWindow = new google.maps.InfoWindow({ content });
                 marker.addListener("click", function() {
-                  infowindow.open(map, marker);
+                  if (lastInfoWindow && lastInfoWindow.close) {
+                    lastInfoWindow.close();
+                  }
+
+                  lastInfoWindow = infoWindow;
+                  infoWindow.open(map, marker);
                 });
               });
             },
