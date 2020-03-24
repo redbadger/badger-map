@@ -72,6 +72,10 @@
         margin: 10px;
         padding: 10px 17px;
       }
+
+      #add-yourself-info h1 {
+        font-size: 1.2em;
+      }
     </style>
   </head>
   <body>
@@ -87,8 +91,11 @@
     <div id="main"></div>
 
     <div id="add-yourself-info">
-      Rightclick your home on the map to<br />see instructions for adding
-      yourself.
+      <h1>🗺 Not on the map yet?</h1>
+      <p>
+        Click on your home on the map to<br />see instructions for adding
+        yourself.
+      </p>
     </div>
 
     <script type="text/javascript">
@@ -257,7 +264,7 @@
           </table>
         `;
         const infowindow = new google.maps.InfoWindow({ content });
-        map.addListener("rightclick", function(e) {
+        map.addListener("click", function(e) {
           content.querySelector(".lat").textContent = e.latLng.lat();
           content.querySelector(".lng").textContent = e.latLng.lng();
           infowindow.open(map, {
