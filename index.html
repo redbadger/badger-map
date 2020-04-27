@@ -101,8 +101,8 @@
 
     <script type="text/javascript">
       // Client ID and API key from the Developer Console
-      const CLIENT_ID = "{CLIENT_ID}";
-      const API_KEY = "{API_KEY}";
+      const CLIENT_ID = "{{CLIENT_ID}}";
+      const API_KEY = "{{API_KEY}}";
 
       // Array of API discovery doc URLs for APIs used by the quickstart
       const DISCOVERY_DOCS = [
@@ -112,7 +112,7 @@
       // Authorization scopes required by the API; multiple scopes can be
       // included, separated by spaces.
       const SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly";
-      const SPREADSHEET_ID = "{SPREADSHEET_ID}";
+      const SPREADSHEET_ID = "{{SPREADSHEET_ID}}";
 
       const authorizeDialog = document.getElementById("authorize-dialog");
       const authorizeButton = document.getElementById("authorize-button");
@@ -287,7 +287,7 @@
       onreadystatechange="if (this.readyState === 'complete') this.onload()"
     ></script>
     <script
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDUS71lkbmxyHuk1Z78oK6srFbtFoyknnE&callback=initMap"
+      src="https://maps.googleapis.com/maps/api/js?key={{API_KEY}}&callback=initMap"
       async
       defer
     ></script>

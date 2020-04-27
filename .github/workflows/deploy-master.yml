@@ -6,7 +6,7 @@ name: CI
 on:
   push:
     branches:
-      - "master"
+      - "open-source"
 
 jobs:
   build:
@@ -26,9 +26,9 @@ jobs:
           echo "Client ID $CLIENT_ID"
           echo "Spreadsheet ID $SPREADSHEET_ID" 
 
-          sed -i "s/{API_KEY}/$API_KEY/" index.html
-          sed -i "s/{CLIENT_ID}/$CLIENT_ID/" index.html
-          sed -i "s/{SPREADSHEET_ID}/$SPREADSHEET_ID/" index.html
+          sed -i "s/{{API_KEY}}/$API_KEY/g" index.html
+          sed -i "s/{{CLIENT_ID}}/$CLIENT_ID/g" index.html
+          sed -i "s/{{SPREADSHEET_ID}}/$SPREADSHEET_ID/g" index.html
 
           cat index.html
           git rev-parse HEAD > sha.txt
