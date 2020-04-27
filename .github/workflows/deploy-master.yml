@@ -7,21 +7,16 @@ on:
   push:
     branches:
       - "open-source" # FIXME set to master
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout
         uses: actions/checkout@v2
 
-      # Runs a single command using the runners shell
-      - name: Replace secrets
+      - name: Prepare deployment
         env:
           API_KEY: ${{ secrets.API_KEY }}
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
@@ -39,15 +34,12 @@ jobs:
           git rev-parse HEAD > sha.txt
 
           mkdir build
-          cp index.html badger-pin.ng sha.txt build/
+          cp index.html badger-pin.png sha.txt build/
 
-          false
-
-      # Runs a set of commands using the runners shell
       - name: Deploy
         if: success()
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
-          ACCESS_TO KEN: ${{ secrets.ACCESS_TOKEN }}
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           BRANCH: gh-pages # The branch the action should deploy to.
           FOLDER: build # The folder the action should deploy.
