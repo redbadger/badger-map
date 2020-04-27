@@ -21,12 +21,9 @@ You can rightclick any position on the map to figure out your latitude/longitude
 
 ## Running locally
 
-The simplest way of running this locally for development without any additional
-tools is using Python:
+> TODO Fix these instructions now that secrets are substituted by CI
 
-```sh
-python -m SimpleHTTPServer 8000
-```
+...
 
 Then you can open <http://localhost:8000> and everything should work.
 
@@ -54,10 +51,12 @@ see where people live.
 
 The page uses the following Google services:
 
-- [Maps JS API]() to... well, draw the map
-- [Spreadsheets read-only API]() to load data from the spreadsheet
-- [Authentication](), in order to access the spreadsheet API on behalf of the
-  person looking at the page
+- [Maps JS API](https://developers.google.com/maps/documentation/javascript/tutorial)
+  to... well, draw the map
+- [Spreadsheets API](https://developers.google.com/sheets/api)
+  to load data from the spreadsheet
+- [Authentication](https://developers.google.com/identity/sign-in/web/reference),
+  in order to access the spreadsheet API on behalf of the person looking at the page
 
 The JavaScript code on the page first start an authentication flow and when
 successful, fetches the data from the spreadsheet, as a collection of rows and
@@ -67,7 +66,7 @@ creates markers on the map.
 
 The spreadsheet needs to have four columns:
 
-```
+```txt
 Name, Latitude, Longitude, Slack handle
 ```
 
@@ -139,4 +138,4 @@ In your repository settings, find the secrets section and create four secrets:
 You'll need to push a change to the master branch. You can slightly edit the
 readme, for example. You should see the Github Action run and the `gh-pages`
 branch should update, which should deploy the map to github pages, i.e.
-https://{yourname}.github.io/{your-fork-name}/.
+`https://{yourname}.github.io/{your-fork-name}/`.
