@@ -50,13 +50,17 @@ http
           res.setHeader("Server", "node.js");
           res.setHeader("Content-type", map[ext] || "text/plain");
 
-          res.end(
-            data
-              .toString()
-              .replace(/\{\{CLIENT_ID\}\}/g, process.env.CLIENT_ID)
-              .replace(/\{\{API_KEY\}\}/g, process.env.API_KEY)
-              .replace(/\{\{SPREADSHEET_ID\}\}/g, process.env.SPREADSHEET_ID)
-          );
+          if (ext == ".html") {
+            res.end(
+              data
+                .toString()
+                .replace(/\{\{CLIENT_ID\}\}/g, process.env.CLIENT_ID)
+                .replace(/\{\{API_KEY\}\}/g, process.env.API_KEY)
+                .replace(/\{\{SPREADSHEET_ID\}\}/g, process.env.SPREADSHEET_ID)
+            );
+          } else {
+            res.end(data);
+          }
         }
       });
     });
