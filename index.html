@@ -101,13 +101,12 @@
 
     <script type="text/javascript">
       // Client ID and API key from the Developer Console
-      const CLIENT_ID =
-        "210239184765-3di0koo4a4da0808q3mr8pvpacb091ik.apps.googleusercontent.com";
+      const CLIENT_ID = "210239184765-3di0koo4a4da0808q3mr8pvpacb091ik.apps.googleusercontent.com";
       const API_KEY = "AIzaSyDUS71lkbmxyHuk1Z78oK6srFbtFoyknnE";
 
       // Array of API discovery doc URLs for APIs used by the quickstart
       const DISCOVERY_DOCS = [
-        "https://sheets.googleapis.com/$discovery/rest?version=v4"
+        "https://sheets.googleapis.com/$discovery/rest?version=v4",
       ];
 
       // Authorization scopes required by the API; multiple scopes can be
@@ -136,9 +135,9 @@
             apiKey: API_KEY,
             clientId: CLIENT_ID,
             discoveryDocs: DISCOVERY_DOCS,
-            scope: SCOPES
+            scope: SCOPES,
           })
-          .then(function() {
+          .then(function () {
             // Listen for sign-in state changes.
             gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
 
@@ -146,7 +145,7 @@
             updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
             authorizeButton.onclick = handleAuthClick;
           })
-          .catch(function(e) {
+          .catch(function (e) {
             console.error("Failed to initialise", e);
           });
       }
@@ -184,7 +183,7 @@
 
         map = new google.maps.Map(main, {
           center: { lat: 51.507, lng: -0.128 },
-          zoom: 11
+          zoom: 11,
         });
       }
 
@@ -195,10 +194,10 @@
         gapi.client.sheets.spreadsheets.values
           .get({
             spreadsheetId: SPREADSHEET_ID,
-            range: "people"
+            range: "people",
           })
           .then(
-            function(response) {
+            function (response) {
               const range = response.result;
 
               var pinIcon = new google.maps.MarkerImage(
@@ -211,14 +210,14 @@
 
               let lastInfoWindow;
 
-              range.values.forEach(function(row) {
+              range.values.forEach(function (row) {
                 const [name, lat, lng, slack] = row;
 
                 const marker = new google.maps.Marker({
                   position: { lat: +lat, lng: +lng },
                   animation: google.maps.Animation.DROP,
                   icon: pinIcon,
-                  map
+                  map,
                 });
                 const content = document.createElement("div");
                 content.className = "map-info-window";
@@ -227,7 +226,7 @@
                 content.querySelector("p").textContent = `Slack: ${slack}`;
 
                 const infoWindow = new google.maps.InfoWindow({ content });
-                marker.addListener("click", function() {
+                marker.addListener("click", function () {
                   if (lastInfoWindow && lastInfoWindow.close) {
                     lastInfoWindow.close();
                   }
@@ -237,7 +236,7 @@
                 });
               });
             },
-            function(response) {
+            function (response) {
               console.error("Error: " + response.result.error.message);
             }
           );
@@ -252,7 +251,7 @@
         content.className = "map-info-window";
         content.innerHTML = `
           <h1>Add yourself</h1>
-          <p>Open the <a href="https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit" target="_blank" rel="noopener">spreadsheet</a> and add your name and Slack handle.<br>Copy the coordinates from here:</p>
+          <p>Open the <a href="https://docs.google.com/spreadsheets/d/$1U_mjJv-3xlxfx1R1-f6eJY5UjWbDEVevu_oCziy4a4I/edit" target="_blank" rel="noopener">spreadsheet</a> and add your name and Slack handle.<br>Copy the coordinates from here:</p>
           <table>
             <tr>
               <th scope="row">Latitude</th>
@@ -265,7 +264,7 @@
           </table>
         `;
         const infowindow = new google.maps.InfoWindow({ content });
-        map.addListener("click", function(e) {
+        map.addListener("click", function (e) {
           content.querySelector(".lat").textContent = e.latLng.lat();
           content.querySelector(".lng").textContent = e.latLng.lng();
           infowindow.open(map, {
@@ -274,7 +273,7 @@
                 case "position":
                   return e.latLng;
               }
-            }
+            },
           });
         });
       }
