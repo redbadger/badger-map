@@ -21,11 +21,19 @@ You can rightclick any position on the map to figure out your latitude/longitude
 
 ## Running locally
 
-> TODO Fix these instructions now that secrets are substituted by CI
+First, you'll need to get a `.env` file from one of the developers. The file
+contains API keys that allow running the map locally. If you're [setting up your
+own map](#id-like-my-own-map-please), you'll need to create a set of keys which
+allow localhost as a referrer.
 
-...
+Then you should be able to run the map locally with
 
-Then you can open <http://localhost:8000> and everything should work.
+```sh
+$ ./run-local.sh
+Server listening on port 8000
+```
+
+Now you can open <http://localhost:8000> and everything should work.
 
 ## I'd like my own map please
 
