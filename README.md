@@ -4,6 +4,8 @@ Where do Badgers live?
 
 [**Here is the map**](https://redbadger.github.io/badger-map)
 
+![Screenshot](./screenshot.png)
+
 ## Why
 
 Now we're all remote, it could be useful to see who are the nearby badgers to you.
