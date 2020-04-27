@@ -6,7 +6,7 @@ name: CI
 on:
   push:
     branches:
-      - "open-source" # FIXME set to master
+      - "master"
 
 jobs:
   build:
