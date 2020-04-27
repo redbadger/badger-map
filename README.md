@@ -37,11 +37,13 @@ effort. There are a couple pre-requisites:
 2. You can create a project in your organisation's developer console and attach
    a billing account (sadly, the necessary Google APIs are not free of charge).
 
+Start by forking the repository on GitHub and do everything below with your fork.
+
 ### The overall architecture
 
 ...if it can be called that. The map is a completely static web page. Everything
-dynamic happens in the browser. It is deployed using [Github pages]() because it's
-the easiest way with no additional tooling.
+dynamic happens in the browser. It is deployed using [Github pages](https://pages.github.com/)
+because it's the easiest way with no additional tooling.
 
 The data is coming from a google spreadsheet shared with everyone in the
 organisation. The sharing preferences double as authorization for access to
@@ -50,8 +52,7 @@ see where people live.
 
 The page uses the following Google services:
 
-\* [Maps JS API]() to... well, draw the map
-
+- [Maps JS API]() to... well, draw the map
 - [Spreadsheets read-only API]() to load data from the spreadsheet
 - [Authentication](), in order to access the spreadsheet API on behalf of the
   person looking at the page
@@ -72,6 +73,10 @@ Next, mark the range where the data will go, and in the menu under "Data" select
 Named Ranges, add one and name it "People" (this is what the code assumes).
 
 Set the sharing settings to "anyone within organisation can find and edit"
+
+Copy the ID of the spreadsheet from the URL. The URL will look something like this:
+`https://docs.google.com/spreadsheets/d/1U_mjJv-3xlxgx1R1-f6eJY5UjWbDEVevu_oCziy4a4I/edit#gid=0`
+the ID is the `1U_mjJv-3xlxgx1R1-f6eJY5UjWbDEVevu_oCziy4a4I` part. Note it down.
 
 ### Create the google project and get API key
 
@@ -111,6 +116,25 @@ an OAuth Client ID. This will let us do things on behalf of the users. Pick "Web
 Application" and put the same two URLs as above as "Authorised JavaScript origins".
 Note down the Client ID at the top right.
 
-### Set up the deployment pipeline
+### Configure Github Pages and Secrets for Github Actions
 
-TODO build the deployment pipeline
+The map is set up to deploy to Github Pages. As a deployment source, we'll use
+`gh-pages` branch. Make sure you have one. In your repository settings, enable
+Github Pages and choose `gh-pages` as a source.
+
+In order to avoid our API tokens to be accidentally used by forks of the repo,
+the map is deployed to the `gh-pages` branch via a Github Actions pipeline, which
+injects the necessary configuration. A nice side-effect is you don't need to
+change the code at all.
+
+In your repository settings, find the secrets section and create four secrets:
+
+- `ACCESS_TOKEN` with your [Personal Access Token](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line) which has access to the repo
+- `API_KEY` with the Google API key from earlier
+- `CLIENT_ID` the Google OAuth Client ID from earlier
+- `SPREADSHEET_ID` the ID of your spreadsheet from earlier
+
+You'll need to push a change to the master branch. You can slightly edit the
+readme, for example. You should see the Github Action run and the `gh-pages`
+branch should update, which should deploy the map to github pages, i.e.
+https://{yourname}.github.io/{your-fork-name}/.
