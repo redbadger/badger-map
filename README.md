@@ -120,7 +120,7 @@ Referrers" restriction and put in the URL of your site (e.g. `http://my-page.git
 and `http://localhost:8000`). Additionally, restrict the key to access the two
 APIs we just enabled (just in case you later add more).
 
-Get baack to the credentials screen and create another credential, this time
+Get back to the credentials screen and create another credential, this time
 an OAuth Client ID. This will let us do things on behalf of the users. Pick "Web
 Application" and put the same two URLs as above as "Authorised JavaScript origins".
 Note down the Client ID at the top right.
