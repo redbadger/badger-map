@@ -87,7 +87,7 @@ Copy the ID of the spreadsheet from the URL. The URL will look something like th
 `https://docs.google.com/spreadsheets/d/1U_mjJv-3xlxgx1R1-f6eJY5UjWbDEVevu_oCziy4a4I/edit#gid=0`
 the ID is the `1U_mjJv-3xlxgx1R1-f6eJY5UjWbDEVevu_oCziy4a4I` part. Note it down.
 
-### Create the google project and get API key
+### Create the google project and get API keys
 
 This is the trickiest part of the set up. You may want to make a cup of tea.
 
@@ -115,15 +115,22 @@ You will need to go into each APIs page and click "Enable".
 Finally, we need to generate a set of credentials to allow access. Once again in
 the hamburger menu, pick "Api & Services" and "Credentials". At the top of the
 screen, click "Create Credentials" and select "API key". Note down the key, you'll
-need it later on. You should also restrict the key immediately. Use the "HTTP
-Referrers" restriction and put in the URL of your site (e.g. `http://my-page.github.io`)
-and `http://localhost:8000`). Additionally, restrict the key to access the two
-APIs we just enabled (just in case you later add more).
+need it later on.
+
+The key ends up being in the page source, so you should restrict it immediately.
+Use the "HTTP Referrers" restriction and put in the URL of your site (e.g. `http://my-page.github.io`).
+Additionally, restrict the key to access the two APIs we just enabled (just in
+case you later add more).
 
 Get back to the credentials screen and create another credential, this time
 an OAuth Client ID. This will let us do things on behalf of the users. Pick "Web
-Application" and put the same two URLs as above as "Authorised JavaScript origins".
+Application" and put the same URL as above as "Authorised JavaScript origins".
 Note down the Client ID at the top right.
+
+Then repeat the process and create another set of credentials, this time restricted
+to `http://localhost:8000`. We'll use those to run the map locally. These local
+credentials should go into a `.env` file in the root of the repository. Look at
+`.env.example` for ... an example.
 
 ### Configure Github Pages and Secrets for Github Actions
 
