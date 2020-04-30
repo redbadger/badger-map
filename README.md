@@ -17,7 +17,7 @@ If you wish to participate, you have two options:
 - Let me know your postcode on slack (@charypar)
 - Add yourself into [this spreadsheet](https://docs.google.com/spreadsheets/d/1U_mjJv-3xlxfx1R1-f6eJY5UjWbDEVevu_oCziy4a4I/edit)
 
-You can leftclick any position on the map to figure out your latitude/longitude.
+You can click any position on the map to figure out your latitude/longitude.
 
 ## Running locally
 
