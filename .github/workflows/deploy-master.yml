@@ -34,7 +34,7 @@ jobs:
           git rev-parse HEAD > sha.txt
 
           mkdir build
-          cp index.html badger-pin.png sha.txt build/
+          cp index.html badger-pin.png favicon.ico sha.txt build/
 
       - name: Deploy
         if: success()
