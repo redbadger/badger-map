@@ -3,7 +3,7 @@
   <head>
     <title>Badger Map</title>
     <meta charset="utf-8" />
-    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="icon" href="./favicon.ico" type="image/x-icon" />
     <style type="text/css">
       html,
       body {
@@ -186,6 +186,36 @@
           center: { lat: 51.507, lng: -0.128 },
           zoom: 11,
         });
+
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            function (position) {
+              const pos = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              };
+
+              const selfMarker = new google.maps.Marker({
+                position: pos,
+                icon: {
+                  path: google.maps.SymbolPath.CIRCLE,
+                  scale: 8,
+                  strokeColor: "#f0faff",
+                  strokeWeight: 2,
+                  fillColor: "#1976d2",
+                  fillOpacity: 1,
+                },
+                map,
+              });
+
+              map.setCenter(pos);
+              map.setZoom(14);
+            },
+            function () {
+              console.info("Could not obtain location information");
+            }
+          );
+        }
       }
 
       /**
