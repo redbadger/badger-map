@@ -31,6 +31,28 @@
         margin: 1rem 0 0.3rem;
       }
 
+      .map-info-window dl {
+        width: 12rem;
+        margin: 1rem 0 0.3rem;
+      }
+
+      dt {
+        float: left;
+        clear: left;
+        width: 4.2rem;
+        text-align: left;
+        font-weight: bold;
+      }
+
+      dt::after {
+        content: ":";
+      }
+
+      dd {
+        margin: 0 0 0 4.4rem;
+        padding: 0 0 0.5em 0;
+      }
+
       .map-info-window table th {
         text-align: left;
       }
@@ -238,24 +260,29 @@
       }
 
       function infoWindow(dataIndex) {
-        const [name, lat, lng, slack] = state.people[dataIndex];
+        const { name, position, slack } = state.people[dataIndex];
         const content = document.createElement("div");
 
         content.className = "map-info-window";
         content.innerHTML =
-          '<h1></h1><p class="slack"></p><p class="distance"></p>';
+          '<h1></h1><dl class="info"><dt>Slack</dt><dd class="slack"></dd><dt>Distance</dt><dd class="distance"></dd></dl><p class="directions"><a>Get directions</a></p>';
         content.querySelector("h1").textContent = name;
-        content.querySelector("p.slack").textContent = `Slack: ${slack}`;
+        content.querySelector("dd.slack").textContent = slack;
 
         if (state.location) {
-          const loc = { lat, lng };
-          const dist = distance(state.location, loc).toFixed(1);
-          const text =
-            dist <= 5.0
-              ? `Distance: ${dist} km`
-              : `Distance: ${dist} km (too far)`;
+          // overestimate the distance to compensate for obstacles. This is super
+          // scientific, obviously
+          const dist = (1.22 * distance(state.location, position)).toFixed(1);
+          const text = `about ${dist} km`;
 
-          content.querySelector("p.distance").textContent = text;
+          content.querySelector("dd.distance").textContent = text;
+          content
+            .querySelector("p.directions a")
+            .setAttribute(
+              "href",
+              `https://maps.google.com?daddr=${position.lat},${position.lng}`
+            );
+        } else {
         }
 
         return new google.maps.InfoWindow({ content });
@@ -272,10 +299,10 @@
           })
           .then(
             function (response) {
-              state.people = response.result.values;
+              const people = response.result.values;
 
               // Initialise the markers
-              state.people.forEach(function (row, idx) {
+              state.people = people.map(function (row, idx) {
                 const [name, lat, lng, slack] = row;
                 const position = { lat: +lat, lng: +lng };
 
@@ -294,6 +321,8 @@
                   state.infoWindow = infoWindow(idx);
                   state.infoWindow.open(map, marker);
                 });
+
+                return { name, position, slack };
               });
             },
             function (response) {
