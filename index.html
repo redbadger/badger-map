@@ -259,8 +259,7 @@
         }
       }
 
-      function infoWindow(dataIndex) {
-        const { name, position, slack } = state.people[dataIndex];
+      function infoWindow({ name, position, slack }) {
         const content = document.createElement("div");
 
         content.className = "map-info-window";
@@ -289,6 +288,19 @@
         return new google.maps.InfoWindow({ content });
       }
 
+      function markerClickHandler(idx, marker) {
+        return function () {
+          if (state.infoWindow && state.infoWindow.close) {
+            state.infoWindow.close();
+          }
+
+          // Update the info window based on *current* state
+          // This is called every time a marker is clicked
+          state.infoWindow = infoWindow(state.people[idx]);
+          state.infoWindow.open(map, marker);
+        };
+      }
+
       /**
        * Get the spreadsheet data
        */
@@ -313,15 +325,7 @@
                   icon: pinIcon,
                   map,
                 });
-
-                marker.addListener("click", function () {
-                  if (state.infoWindow && state.infoWindow.close) {
-                    state.infoWindow.close();
-                  }
-
-                  state.infoWindow = infoWindow(idx);
-                  state.infoWindow.open(map, marker);
-                });
+                marker.addListener("click", markerClickHandler(idx, marker));
 
                 return { name, position, slack };
               });
