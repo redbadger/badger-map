@@ -31,6 +31,28 @@
         margin: 1rem 0 0.3rem;
       }
 
+      .map-info-window dl {
+        width: 12rem;
+        margin: 1rem 0 0.3rem;
+      }
+
+      dt {
+        float: left;
+        clear: left;
+        width: 4.2rem;
+        text-align: left;
+        font-weight: bold;
+      }
+
+      dt::after {
+        content: ":";
+      }
+
+      dd {
+        margin: 0 0 0 4.4rem;
+        padding: 0 0 0.5em 0;
+      }
+
       .map-info-window table th {
         text-align: left;
       }
@@ -121,7 +143,14 @@
       const authorizeDialog = document.getElementById("authorize-dialog");
       const authorizeButton = document.getElementById("authorize-button");
       const addYourselfInfo = document.getElementById("add-yourself-info");
-      let map, geocoder; // initialised by initMap()
+
+      let map, pinIcon; // initialised by initMap()
+      const state = {
+        location: null,
+        locationMarker: null,
+        infoWindow: null,
+        people: [],
+      };
 
       /**
        *  On load, called to load the auth2 library and API client library.
@@ -191,16 +220,24 @@
           zoom: 11,
         });
 
+        pinIcon = new google.maps.MarkerImage(
+          "./badger-pin.png",
+          null /* size is determined at runtime */,
+          null /* origin is 0,0 */,
+          null /* anchor is bottom center of the scaled image */,
+          new google.maps.Size(30, 50)
+        );
+
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
             function (position) {
-              const pos = {
+              state.location = {
                 lat: position.coords.latitude,
                 lng: position.coords.longitude,
               };
 
-              const selfMarker = new google.maps.Marker({
-                position: pos,
+              state.locationMarker = new google.maps.Marker({
+                position: state.location,
                 icon: {
                   path: google.maps.SymbolPath.CIRCLE,
                   scale: 8,
@@ -212,7 +249,7 @@
                 map,
               });
 
-              map.setCenter(pos);
+              map.setCenter(state.location);
               map.setZoom(14);
             },
             function () {
@@ -220,6 +257,55 @@
             }
           );
         }
+      }
+
+      /*
+       * Create and configure the marker infoWindow content
+       */
+      function infoWindow({ name, position, slack }, location) {
+        const content = document.createElement("div");
+
+        content.className = "map-info-window";
+        content.innerHTML =
+          '<h1></h1><dl class="info"><dt class="slack">Slack</dt><dd class="slack"></dd><dt class="distance">Distance</dt><dd class="distance"></dd></dl><p class="directions"><a>Get directions</a></p>';
+        content.querySelector("h1").textContent = name;
+        content.querySelector("dd.slack").textContent = slack;
+        content
+          .querySelector("p.directions a")
+          .setAttribute(
+            "href",
+            `https://maps.google.com?daddr=${position.lat},${position.lng}`
+          );
+
+        if (location) {
+          // overestimate the distance to compensate for obstacles. This is super
+          // scientific, obviously
+          const dist = (1.22 * distance(state.location, position)).toFixed(1);
+          const text = `about ${dist} km`;
+
+          content.querySelector("dd.distance").textContent = text;
+        } else {
+          content.querySelectorAll("dl .distance").forEach((el) => el.remove());
+        }
+
+        return new google.maps.InfoWindow({ content });
+      }
+
+      /*
+       * Create a click handler for a marker for the person at index idx
+       * The handler will re-create the infoWindow based on state every time
+       */
+      function markerClickHandler(idx, marker) {
+        return function () {
+          if (state.infoWindow && state.infoWindow.close) {
+            state.infoWindow.close();
+          }
+
+          // Update the info window based on *current* state
+          // This is called every time a marker is clicked
+          state.infoWindow = infoWindow(state.people[idx], state.location);
+          state.infoWindow.open(map, marker);
+        };
       }
 
       /**
@@ -233,42 +319,22 @@
           })
           .then(
             function (response) {
-              const range = response.result;
+              const people = response.result.values;
 
-              var pinIcon = new google.maps.MarkerImage(
-                "./badger-pin.png",
-                null /* size is determined at runtime */,
-                null /* origin is 0,0 */,
-                null /* anchor is bottom center of the scaled image */,
-                new google.maps.Size(30, 50)
-              );
-
-              let lastInfoWindow;
-
-              range.values.forEach(function (row) {
+              // Initialise the markers
+              state.people = people.map(function (row, idx) {
                 const [name, lat, lng, slack] = row;
+                const position = { lat: +lat, lng: +lng };
 
                 const marker = new google.maps.Marker({
-                  position: { lat: +lat, lng: +lng },
+                  position,
                   animation: google.maps.Animation.DROP,
                   icon: pinIcon,
                   map,
                 });
-                const content = document.createElement("div");
-                content.className = "map-info-window";
-                content.innerHTML = "<h1></h1><p></p>";
-                content.querySelector("h1").textContent = name;
-                content.querySelector("p").textContent = `Slack: ${slack}`;
+                marker.addListener("click", markerClickHandler(idx, marker));
 
-                const infoWindow = new google.maps.InfoWindow({ content });
-                marker.addListener("click", function () {
-                  if (lastInfoWindow && lastInfoWindow.close) {
-                    lastInfoWindow.close();
-                  }
-
-                  lastInfoWindow = infoWindow;
-                  infoWindow.open(map, marker);
-                });
+                return { name, position, slack };
               });
             },
             function (response) {
@@ -278,7 +344,30 @@
       }
 
       /**
-       * Show a info window on right click, describing how to add youself to
+       * Calculate a great circle distance between two points using the Haversine
+       * formula
+       */
+      function distance(origin, destination) {
+        const rad = (n) => (n / 180) * Math.PI;
+        const sin_2 = (x) => Math.sin(x) * Math.sin(x);
+        const D = 2 * 6371; // Km
+
+        const [lat1, lat2] = [rad(origin.lat), rad(destination.lat)];
+        const [lng1, lng2] = [rad(origin.lng), rad(destination.lng)];
+
+        return (
+          D *
+          Math.asin(
+            Math.sqrt(
+              sin_2((lat1 - lat2) / 2) +
+                Math.cos(lat1) * Math.cos(lat2) * sin_2((lng1 - lng2) / 2)
+            )
+          )
+        );
+      }
+
+      /**
+       * Show a info window on click, describing how to add youself to
        * the map.
        */
       function setupAddYourselfWindow() {
