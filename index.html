@@ -259,7 +259,10 @@
         }
       }
 
-      function infoWindow({ name, position, slack }) {
+      /*
+       * Create and configure the marker infoWindow content
+       */
+      function infoWindow({ name, position, slack }, location) {
         const content = document.createElement("div");
 
         content.className = "map-info-window";
@@ -274,7 +277,7 @@
             `https://maps.google.com?daddr=${position.lat},${position.lng}`
           );
 
-        if (state.location) {
+        if (location) {
           // overestimate the distance to compensate for obstacles. This is super
           // scientific, obviously
           const dist = (1.22 * distance(state.location, position)).toFixed(1);
@@ -288,6 +291,10 @@
         return new google.maps.InfoWindow({ content });
       }
 
+      /*
+       * Create a click handler for a marker for the person at index idx
+       * The handler will re-create the infoWindow based on state every time
+       */
       function markerClickHandler(idx, marker) {
         return function () {
           if (state.infoWindow && state.infoWindow.close) {
@@ -296,7 +303,7 @@
 
           // Update the info window based on *current* state
           // This is called every time a marker is clicked
-          state.infoWindow = infoWindow(state.people[idx]);
+          state.infoWindow = infoWindow(state.people[idx], state.location);
           state.infoWindow.open(map, marker);
         };
       }
@@ -360,7 +367,7 @@
       }
 
       /**
-       * Show a info window on right click, describing how to add youself to
+       * Show a info window on click, describing how to add youself to
        * the map.
        */
       function setupAddYourselfWindow() {
