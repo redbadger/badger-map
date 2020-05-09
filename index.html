@@ -281,7 +281,8 @@
           // overestimate the distance to compensate for obstacles. This is super
           // scientific, obviously
           const dist = (1.22 * distance(state.location, position)).toFixed(1);
-          const time = dist / 5.0; // hrs
+          const walkingSpeed = 5.0; // km/h
+          const time = dist / walkingSpeed; // hrs
           const hrs = Math.floor(time);
           const mins = Math.round((time % 1) * 60);
 
