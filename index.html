@@ -265,9 +265,15 @@
 
         content.className = "map-info-window";
         content.innerHTML =
-          '<h1></h1><dl class="info"><dt>Slack</dt><dd class="slack"></dd><dt>Distance</dt><dd class="distance"></dd></dl><p class="directions"><a>Get directions</a></p>';
+          '<h1></h1><dl class="info"><dt class="slack">Slack</dt><dd class="slack"></dd><dt class="distance">Distance</dt><dd class="distance"></dd></dl><p class="directions"><a>Get directions</a></p>';
         content.querySelector("h1").textContent = name;
         content.querySelector("dd.slack").textContent = slack;
+        content
+          .querySelector("p.directions a")
+          .setAttribute(
+            "href",
+            `https://maps.google.com?daddr=${position.lat},${position.lng}`
+          );
 
         if (state.location) {
           // overestimate the distance to compensate for obstacles. This is super
@@ -276,13 +282,8 @@
           const text = `about ${dist} km`;
 
           content.querySelector("dd.distance").textContent = text;
-          content
-            .querySelector("p.directions a")
-            .setAttribute(
-              "href",
-              `https://maps.google.com?daddr=${position.lat},${position.lng}`
-            );
         } else {
+          content.querySelectorAll("dl .distance").forEach((el) => el.remove());
         }
 
         return new google.maps.InfoWindow({ content });
