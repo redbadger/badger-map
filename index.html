@@ -281,7 +281,14 @@
           // overestimate the distance to compensate for obstacles. This is super
           // scientific, obviously
           const dist = (1.22 * distance(state.location, position)).toFixed(1);
-          const text = `about ${dist} km`;
+          const time = dist / 5.0; // hrs
+          const hrs = Math.floor(time);
+          const mins = Math.round((time % 1) * 60);
+
+          const hrsText =
+            hrs > 0 ? (hrs < 2 ? `${hrs} hour and ` : `${hrs} hours and`) : "";
+          const minsText = mins < 2 ? `${mins} minute` : `${mins} minutes`;
+          const text = `about ${hrsText}${minsText} walk`;
 
           content.querySelector("dd.distance").textContent = text;
         } else {
