@@ -173,10 +173,17 @@
         people: [],
       };
 
+      /* This is not pretty, but it lets us handle the waiting
+         for async script loading relatively neatly with await later
+       */
+
+      var gapiLoadOkay, gapiLoadFail;
       const gapiLoadPromise = new Promise((resolve, reject) => {
         gapiLoadOkay = resolve;
         gapiLoadFail = reject;
       });
+
+      var gisLoadOkay, gisLoadFail;
       const gisLoadPromise = new Promise((resolve, reject) => {
         gisLoadOkay = resolve;
         gisLoadFail = reject;
