@@ -225,6 +225,7 @@
           people = await loadPeople();
         } catch (err) {
           console.error("Error fetching people data: ", err);
+          return;
         }
 
         // Got data, update the UI
